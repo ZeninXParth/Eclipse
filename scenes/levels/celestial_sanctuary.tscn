@@ -1,0 +1,204 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/celestial_sanctuary.gd" id="1_sanctuary"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/world/bench_checkpoint.gd" id="3_bench"]
+[ext_resource type="PackedScene" path="res://scenes/objects/ability_pickup.tscn" id="4_pickup"]
+[ext_resource type="Script" path="res://scripts/world/transition_point.gd" id="5_gate"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="6_hud"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(1700, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_left"]
+size = Vector2(60, 600)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_right"]
+size = Vector2(60, 600)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ceiling"]
+size = Vector2(1700, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_balcony"]
+size = Vector2(320, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_step"]
+size = Vector2(100, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bench_col"]
+size = Vector2(50, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate_col"]
+size = Vector2(40, 100)
+
+[node name="CelestialSanctuary" type="Node2D" node_paths=PackedStringArray("bench", "wings_pickup", "mask_shard_pickup", "player")]
+script = ExtResource("1_sanctuary")
+room_id = "celestial_sanctuary"
+room_name = "The Celestial Sanctuary"
+limit_left = -100
+limit_right = 1600
+limit_top = -200
+limit_bottom = 800
+respawn_y_threshold = 900.0
+default_spawn_point = Vector2(160, 520)
+bench = NodePath("Bench_Sanctuary")
+wings_pickup = NodePath("AbilityPickup_Wings")
+mask_shard_pickup = NodePath("AbilityPickup_MaskShard")
+player = NodePath("Player")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_left = -200.0
+offset_top = -300.0
+offset_right = 1800.0
+offset_bottom = 900.0
+color = Color(0.03, 0.04, 0.07, 1)
+
+[node name="CathedralArches" type="Node2D" parent="."]
+
+[node name="Arch1" type="ColorRect" parent="CathedralArches"]
+offset_left = 220.0
+offset_top = 80.0
+offset_right = 240.0
+offset_bottom = 560.0
+color = Color(0.08, 0.10, 0.16, 0.6)
+
+[node name="Arch2" type="ColorRect" parent="CathedralArches"]
+offset_left = 640.0
+offset_top = 60.0
+offset_right = 660.0
+offset_bottom = 560.0
+color = Color(0.08, 0.10, 0.16, 0.6)
+
+[node name="Arch3" type="ColorRect" parent="CathedralArches"]
+offset_left = 1060.0
+offset_top = 80.0
+offset_right = 1080.0
+offset_bottom = 560.0
+color = Color(0.08, 0.10, 0.16, 0.6)
+
+[node name="StarlightRays" type="Node2D" parent="."]
+
+[node name="Ray1" type="ColorRect" parent="StarlightRays"]
+offset_left = 580.0
+offset_top = 40.0
+offset_right = 720.0
+offset_bottom = 560.0
+rotation = 0.05
+color = Color(0.35, 0.65, 1.0, 0.06)
+
+[node name="WorldGeometry" type="StaticBody2D" parent="."]
+collision_mask = 0
+
+[node name="FloorCollision" type="CollisionShape2D" parent="WorldGeometry"]
+position = Vector2(750, 590)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="FloorVisual" type="ColorRect" parent="WorldGeometry/FloorCollision"]
+offset_left = -850.0
+offset_top = -30.0
+offset_right = 850.0
+offset_bottom = 30.0
+color = Color(0.09, 0.10, 0.14, 1)
+
+[node name="LeftWallCollision" type="CollisionShape2D" parent="WorldGeometry"]
+position = Vector2(-30, 300)
+shape = SubResource("RectangleShape2D_wall_left")
+
+[node name="RightWallCollision" type="CollisionShape2D" parent="WorldGeometry"]
+position = Vector2(1530, 300)
+shape = SubResource("RectangleShape2D_wall_right")
+
+[node name="CeilingCollision" type="CollisionShape2D" parent="WorldGeometry"]
+position = Vector2(750, -30)
+shape = SubResource("RectangleShape2D_ceiling")
+
+[node name="HighBalconyCollision" type="CollisionShape2D" parent="WorldGeometry"]
+position = Vector2(1260, 392)
+shape = SubResource("RectangleShape2D_balcony")
+
+[node name="BalconyVisual" type="ColorRect" parent="WorldGeometry/HighBalconyCollision"]
+offset_left = -160.0
+offset_top = -12.0
+offset_right = 160.0
+offset_bottom = 12.0
+color = Color(0.12, 0.14, 0.20, 1)
+
+[node name="MidStepCollision" type="CollisionShape2D" parent="WorldGeometry"]
+position = Vector2(960, 480)
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
+
+[node name="StepVisual" type="ColorRect" parent="WorldGeometry/MidStepCollision"]
+offset_left = -50.0
+offset_top = -10.0
+offset_right = 50.0
+offset_bottom = 10.0
+color = Color(0.11, 0.13, 0.18, 1)
+
+[node name="Bench_Sanctuary" type="Area2D" parent="."]
+position = Vector2(340, 560)
+collision_layer = 256
+collision_mask = 2
+script = ExtResource("3_bench")
+bench_id = "Bench_Sanctuary"
+bench_name = "Veiled Sanctuary Bench"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bench_Sanctuary"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_bench_col")
+
+[node name="AbilityPickup_Wings" parent="." instance=ExtResource("4_pickup")]
+position = Vector2(650, 560)
+pickup_id = "ability_double_jump"
+ability_name = "double_jump"
+display_name = "Wings of the Lunar Eclipse"
+description_text = "Press Jump while airborne to unfurl spectral lunar wings and ascend anew."
+
+[node name="AbilityPickup_MaskShard" parent="." instance=ExtResource("4_pickup")]
+position = Vector2(1260, 380)
+pickup_id = "mask_shard_sanctuary"
+pickup_type = 1
+ability_name = ""
+display_name = "Fragment of the Ancient Mask"
+description_text = "Ancient fragment of life. Collect 4 to forge an additional health mask."
+
+[node name="Gate_West" type="Area2D" parent="."]
+position = Vector2(80, 560)
+collision_layer = 0
+collision_mask = 18
+script = ExtResource("5_gate")
+gate_id = "Sanctuary_West"
+target_room_path = "res://scenes/levels/ancient_chamber.tscn"
+target_gate_id = "Chamber_East"
+travel_direction = Vector2(-1, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gate_West"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_gate_col")
+
+[node name="Sanctuary_West_Spawn" type="Marker2D" parent="."]
+position = Vector2(160, 520)
+
+[node name="Gate_East" type="Area2D" parent="."]
+position = Vector2(1460, 380)
+collision_layer = 0
+collision_mask = 18
+script = ExtResource("5_gate")
+gate_id = "Sanctuary_East"
+target_room_path = "res://scenes/levels/ancient_chamber.tscn"
+target_gate_id = "Chamber_East"
+travel_direction = Vector2(1, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gate_East"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_gate_col")
+
+[node name="Sanctuary_East_Spawn" type="Marker2D" parent="."]
+position = Vector2(1360, 340)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(160, 520)
+
+[node name="DebugHUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("6_hud")
+player = NodePath("../Player")
