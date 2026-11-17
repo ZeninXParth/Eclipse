@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="Resource" path="res://resources/player/default_player_config.tres" id="1_cfg"]
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_dovo2"]
+[ext_resource type="Script" path="res://scripts/player/player_visuals.gd" id="2_gmlin"]
+[ext_resource type="Script" path="res://scripts/combat/health_component.gd" id="3_hlth"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="4_hrtbx"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="5_htbx"]
+[ext_resource type="Script" path="res://scripts/camera/camera_controller.gd" id="6_cam"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lvxji"]
+radius = 10.0
+height = 40.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurt"]
+radius = 11.0
+height = 40.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
+size = Vector2(36, 30)
+
+[node name="Player" type="CharacterBody2D" unique_id=1804709936 node_paths=PackedStringArray("visuals_node", "collision_shape", "health_component", "hitbox", "hitbox_shape", "hurtbox", "hurtbox_shape")]
+collision_layer = 2
+script = ExtResource("1_dovo2")
+config = ExtResource("1_cfg")
+visuals_node = NodePath("Visuals")
+collision_shape = NodePath("CollisionShape2D")
+health_component = NodePath("HealthComponent")
+hitbox = NodePath("Hitbox")
+hitbox_shape = NodePath("Hitbox/CollisionShape2D")
+hurtbox = NodePath("Hurtbox")
+hurtbox_shape = NodePath("Hurtbox/CollisionShape2D")
+
+[node name="Visuals" type="Node2D" parent="." unique_id=1228726503 node_paths=PackedStringArray("controller")]
+script = ExtResource("2_gmlin")
+controller = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=126260158]
+position = Vector2(0, -20)
+shape = SubResource("CapsuleShape2D_lvxji")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=126260159]
+script = ExtResource("3_hlth")
+max_health = 5
+current_health = 5
+default_invulnerability_duration = 1.0
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=126260160 node_paths=PackedStringArray("health_component")]
+collision_layer = 16
+collision_mask = 160
+script = ExtResource("4_hrtbx")
+health_component = NodePath("../HealthComponent")
+is_player_hurtbox = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=126260161]
+position = Vector2(0, -20)
+shape = SubResource("CapsuleShape2D_hurt")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=126260162 node_paths=PackedStringArray("attacker")]
+collision_layer = 8
+collision_mask = 192
+script = ExtResource("5_htbx")
+is_player_hitbox = true
+damage = 1
+knockback_force = 240.0
+attacker = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=126260163]
+position = Vector2(26, -20)
+shape = SubResource("RectangleShape2D_hit")
+disabled = true
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1620486099]
+position = Vector2(0, -30)
+zoom = Vector2(1.2, 1.2)
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+script = ExtResource("6_cam")
