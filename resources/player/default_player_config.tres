@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="PlayerConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_config.gd" id="1_cfg"]
+
+[resource]
+script = ExtResource("1_cfg")
+max_speed = 260.0
+ground_acceleration = 2000.0
+ground_deceleration = 2400.0
+air_acceleration = 1400.0
+air_deceleration = 900.0
+jump_height = 96.0
+time_to_peak = 0.34
+fall_gravity_multiplier = 1.35
+variable_jump_cutoff = 0.5
+max_fall_speed = 650.0
+coyote_duration = 0.12
+jump_buffer_duration = 0.12
+land_duration = 0.08
+wall_slide_speed = 120.0
+wall_jump_velocity = Vector2(300, -480)
+wall_jump_coyote_duration = 0.12
+wall_jump_input_lock_duration = 0.12
+dash_speed = 550.0
+dash_duration = 0.16
+dash_cooldown = 0.4
+max_air_dashes = 1
+attack_damage = 1
+attack_knockback_force = 240.0
+attack_startup_duration = 0.05
+attack_active_duration = 0.07
+attack_recovery_duration = 0.1
+attack_buffer_duration = 0.1
+pogo_bounce_velocity = -460.0
+max_health = 5
+hurt_knockback_speed = 220.0
+knockback_stun_duration = 0.15
+hit_stop_duration = 0.06
+screen_shake_intensity = 6.0
+screen_shake_duration = 0.2
+max_soul = 99
+soul_per_hit = 11
+soul_heal_cost = 33
+focus_charge_duration = 0.85
+double_jump_velocity = -460.0
+mantle_reach_distance = 24.0
+mantle_climb_duration = 0.2
+mantle_pull_offset = Vector2(20, -32)
