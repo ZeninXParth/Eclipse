@@ -1,0 +1,393 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/test_room.gd" id="1_anjkr"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_knmjg"]
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="3_asmw1"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="4_sa601"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/training_dummy.tscn" id="5_dummy"]
+[ext_resource type="Script" path="res://scripts/combat/hazard_zone.gd" id="6_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/walker_enemy.tscn" id="7_walker"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/flyer_enemy.tscn" id="8_flyer"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/charger_enemy.tscn" id="9_charger"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ff50h"]
+size = Vector2(1100, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s3biy"]
+size = Vector2(850, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_op2op"]
+size = Vector2(60, 620)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x4gfd"]
+size = Vector2(60, 620)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ronwj"]
+size = Vector2(100, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o8emw"]
+size = Vector2(100, 128)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fma50"]
+size = Vector2(100, 192)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_l652x"]
+size = Vector2(220, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ity2g"]
+size = Vector2(220, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4c4i7"]
+size = Vector2(90, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_spikes"]
+size = Vector2(90, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shaft_left"]
+size = Vector2(40, 360)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shaft_right"]
+size = Vector2(40, 360)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dash_l"]
+size = Vector2(100, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dash_r"]
+size = Vector2(100, 24)
+
+[node name="TestRoom" type="Node2D" unique_id=701033253 node_paths=PackedStringArray("player")]
+script = ExtResource("1_anjkr")
+player = NodePath("Player")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1438865302]
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 2500.0
+offset_bottom = 1000.0
+color = Color(0.06, 0.07, 0.1, 1)
+
+[node name="Geometry" type="StaticBody2D" parent="." unique_id=445460348]
+collision_mask = 0
+
+[node name="Platform_0" type="CollisionShape2D" parent="Geometry" unique_id=1732475371]
+position = Vector2(450, 530)
+shape = SubResource("RectangleShape2D_ff50h")
+
+[node name="Visual_0" type="Polygon2D" parent="Geometry" unique_id=894825938]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(-100, 500, 1000, 500, 1000, 560, -100, 560)
+
+[node name="Rim_0" type="Line2D" parent="Geometry" unique_id=1577565092]
+points = PackedVector2Array(-100, 501, 1000, 501)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_1" type="CollisionShape2D" parent="Geometry" unique_id=985999699]
+position = Vector2(1775, 530)
+shape = SubResource("RectangleShape2D_s3biy")
+
+[node name="Visual_1" type="Polygon2D" parent="Geometry" unique_id=1458120487]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(1350, 500, 2200, 500, 2200, 560, 1350, 560)
+
+[node name="Rim_1" type="Line2D" parent="Geometry" unique_id=1069273389]
+points = PackedVector2Array(1350, 501, 2200, 501)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_2" type="CollisionShape2D" parent="Geometry" unique_id=1197258901]
+position = Vector2(-70, 250)
+shape = SubResource("RectangleShape2D_op2op")
+
+[node name="Visual_2" type="Polygon2D" parent="Geometry" unique_id=396979124]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(-100, -60, -40, -60, -40, 560, -100, 560)
+
+[node name="Rim_2" type="Line2D" parent="Geometry" unique_id=1599965617]
+points = PackedVector2Array(-100, -59, -40, -59)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_3" type="CollisionShape2D" parent="Geometry" unique_id=1283521397]
+position = Vector2(2170, 250)
+shape = SubResource("RectangleShape2D_x4gfd")
+
+[node name="Visual_3" type="Polygon2D" parent="Geometry" unique_id=1114168255]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(2140, -60, 2200, -60, 2200, 560, 2140, 560)
+
+[node name="Rim_3" type="Line2D" parent="Geometry" unique_id=37337916]
+points = PackedVector2Array(2140, -59, 2200, -59)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_4" type="CollisionShape2D" parent="Geometry" unique_id=197606411]
+position = Vector2(370, 468)
+shape = SubResource("RectangleShape2D_ronwj")
+
+[node name="Visual_4" type="Polygon2D" parent="Geometry" unique_id=963103681]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(320, 436, 420, 436, 420, 500, 320, 500)
+
+[node name="Rim_4" type="Line2D" parent="Geometry" unique_id=1429643954]
+points = PackedVector2Array(320, 437, 420, 437)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_5" type="CollisionShape2D" parent="Geometry" unique_id=887444568]
+position = Vector2(490, 436)
+shape = SubResource("RectangleShape2D_o8emw")
+
+[node name="Visual_5" type="Polygon2D" parent="Geometry" unique_id=1835244104]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(440, 372, 540, 372, 540, 500, 440, 500)
+
+[node name="Rim_5" type="Line2D" parent="Geometry" unique_id=1769235807]
+points = PackedVector2Array(440, 373, 540, 373)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_6" type="CollisionShape2D" parent="Geometry" unique_id=299470170]
+position = Vector2(610, 404)
+shape = SubResource("RectangleShape2D_fma50")
+
+[node name="Visual_6" type="Polygon2D" parent="Geometry" unique_id=1082341463]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(560, 308, 660, 308, 660, 500, 560, 500)
+
+[node name="Rim_6" type="Line2D" parent="Geometry" unique_id=410149622]
+points = PackedVector2Array(560, 309, 660, 309)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_7" type="CollisionShape2D" parent="Geometry" unique_id=1504327729]
+position = Vector2(820, 310)
+shape = SubResource("RectangleShape2D_l652x")
+
+[node name="Visual_7" type="Polygon2D" parent="Geometry" unique_id=1783932969]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(710, 298, 930, 298, 930, 322, 710, 322)
+
+[node name="Rim_7" type="Line2D" parent="Geometry" unique_id=1456767341]
+points = PackedVector2Array(710, 299, 930, 299)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_8" type="CollisionShape2D" parent="Geometry" unique_id=1162746400]
+position = Vector2(820, 190)
+shape = SubResource("RectangleShape2D_ity2g")
+
+[node name="Visual_8" type="Polygon2D" parent="Geometry" unique_id=1560831280]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(710, 178, 930, 178, 930, 202, 710, 202)
+
+[node name="Rim_8" type="Line2D" parent="Geometry" unique_id=165969611]
+points = PackedVector2Array(710, 179, 930, 179)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_9" type="CollisionShape2D" parent="Geometry" unique_id=248234479]
+position = Vector2(1175, 470)
+shape = SubResource("RectangleShape2D_4c4i7")
+
+[node name="Visual_9" type="Polygon2D" parent="Geometry" unique_id=2088763343]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(1130, 458, 1220, 458, 1220, 482, 1130, 482)
+
+[node name="Rim_9" type="Line2D" parent="Geometry" unique_id=1281273797]
+points = PackedVector2Array(1130, 459, 1220, 459)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_Shaft_Left" type="CollisionShape2D" parent="Geometry" unique_id=19200001]
+position = Vector2(1920, 320)
+shape = SubResource("RectangleShape2D_shaft_left")
+
+[node name="Visual_Shaft_Left" type="Polygon2D" parent="Geometry" unique_id=19200002]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(1900, 140, 1940, 140, 1940, 500, 1900, 500)
+
+[node name="Rim_Shaft_Left" type="Line2D" parent="Geometry" unique_id=19200003]
+points = PackedVector2Array(1900, 141, 1940, 141)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_Shaft_Right" type="CollisionShape2D" parent="Geometry" unique_id=20400001]
+position = Vector2(2040, 320)
+shape = SubResource("RectangleShape2D_shaft_right")
+
+[node name="Visual_Shaft_Right" type="Polygon2D" parent="Geometry" unique_id=20400002]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(2020, 140, 2060, 140, 2060, 500, 2020, 500)
+
+[node name="Rim_Shaft_Right" type="Line2D" parent="Geometry" unique_id=20400003]
+points = PackedVector2Array(2020, 141, 2060, 141)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_Dash_Left" type="CollisionShape2D" parent="Geometry" unique_id=13800001]
+position = Vector2(1380, 260)
+shape = SubResource("RectangleShape2D_dash_l")
+
+[node name="Visual_Dash_Left" type="Polygon2D" parent="Geometry" unique_id=13800002]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(1330, 248, 1430, 248, 1430, 272, 1330, 272)
+
+[node name="Rim_Dash_Left" type="Line2D" parent="Geometry" unique_id=13800003]
+points = PackedVector2Array(1330, 249, 1430, 249)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Platform_Dash_Right" type="CollisionShape2D" parent="Geometry" unique_id=16600001]
+position = Vector2(1660, 260)
+shape = SubResource("RectangleShape2D_dash_r")
+
+[node name="Visual_Dash_Right" type="Polygon2D" parent="Geometry" unique_id=16600002]
+color = Color(0.14, 0.17, 0.23, 1)
+polygon = PackedVector2Array(1610, 248, 1710, 248, 1710, 272, 1610, 272)
+
+[node name="Rim_Dash_Right" type="Line2D" parent="Geometry" unique_id=16600003]
+points = PackedVector2Array(1610, 249, 1710, 249)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="HazardSpikes" type="Area2D" parent="." unique_id=312948102]
+position = Vector2(1560, 490)
+collision_layer = 128
+collision_mask = 24
+script = ExtResource("6_hazard")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HazardSpikes" unique_id=312948103]
+position = Vector2(0, 0)
+shape = SubResource("RectangleShape2D_spikes")
+
+[node name="SpikesVisual" type="Polygon2D" parent="HazardSpikes" unique_id=312948104]
+color = Color(0.75, 0.3, 0.3, 0.9)
+polygon = PackedVector2Array(-44, 10, -36, -10, -28, 10, -20, -10, -12, 10, -4, -10, 4, 10, 12, -10, 20, 10, 28, -10, 36, 10, 44, -10, 44, 10)
+
+[node name="Signage" type="Node2D" parent="." unique_id=63982859]
+
+[node name="@Label@2" type="Label" parent="Signage" unique_id=1534036832]
+offset_left = 60.0
+offset_top = 340.0
+offset_right = 60.0
+offset_bottom = 340.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 0.75)
+text = "ECLIPSE — MOVEMENT & COMBAT VERIFICATION CHAMBER
+[A/D] Move | [Space] Jump | [C/Shift] Dash | [Wall+Space] Wall Jump | [J/X] Attack | [W+J/X] Up Slash | [Air+S+J/X] Pogo"
+
+[node name="@Label@3" type="Label" parent="Signage" unique_id=683377290]
+offset_left = 60.0
+offset_top = 440.0
+offset_right = 60.0
+offset_bottom = 440.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 0.75)
+text = "◄ RUNWAY : Horizontal Movement & Training Dummy Combat"
+
+[node name="@Label@DummyHint" type="Label" parent="Signage" unique_id=683377291]
+offset_left = 210.0
+offset_top = 410.0
+offset_right = 210.0
+offset_bottom = 410.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.4, 0.8, 0.95, 0.85)
+text = "▼ TRAINING DUMMY : Melee target, health, knockback & respawn"
+
+[node name="@Label@4" type="Label" parent="Signage" unique_id=1457089749]
+offset_left = 330.0
+offset_top = 240.0
+offset_right = 330.0
+offset_bottom = 240.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 0.75)
+text = "TIERED STEPS : Variable Jump Height (Tap = Short Hop, Hold = Full Jump)"
+
+[node name="@Label@5" type="Label" parent="Signage" unique_id=1006795553]
+offset_left = 730.0
+offset_top = 140.0
+offset_right = 730.0
+offset_bottom = 140.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 0.75)
+text = "HEAD CLEARANCE : Ceiling Proximity"
+
+[node name="@Label@6" type="Label" parent="Signage" unique_id=1603428151]
+offset_left = 1040.0
+offset_top = 390.0
+offset_right = 1040.0
+offset_bottom = 390.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 0.75)
+text = "COYOTE GAP : Walk off ledge and jump mid-air (0.12s grace)"
+
+[node name="@Label@SpikesHint" type="Label" parent="Signage" unique_id=1603428152]
+offset_left = 1480.0
+offset_top = 420.0
+offset_right = 1480.0
+offset_bottom = 420.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(1.0, 0.5, 0.5, 0.85)
+text = "▼ POGO SPIKES : Airborne Down-Slash [S + J/X] to bounce!"
+
+[node name="@Label@7" type="Label" parent="Signage" unique_id=164624309]
+offset_left = 1680.0
+offset_top = 440.0
+offset_right = 1680.0
+offset_bottom = 440.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.55, 0.65, 0.78, 0.75)
+text = "LANDING TRACK : Jump buffering upon approach ►"
+
+[node name="@Label@DashChasmHint" type="Label" parent="Signage" unique_id=13500001]
+offset_left = 1350.0
+offset_top = 210.0
+offset_right = 1350.0
+offset_bottom = 210.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.4, 0.8, 1.0, 0.85)
+text = "▲ DASH CHASM : Mid-air Dash [C / Shift] across 180px gap"
+
+[node name="@Label@WallShaftHint" type="Label" parent="Signage" unique_id=18400001]
+offset_left = 1840.0
+offset_top = 100.0
+offset_right = 1840.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.5, 0.85, 0.7, 0.85)
+text = "▲ WALL SHAFT : Cling to walls [A/D] & chain Wall Jumps [Space]"
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1804709936 node_paths=PackedStringArray("visuals_node", "collision_shape", "health_component", "hitbox", "hitbox_shape", "hurtbox", "hurtbox_shape") instance=ExtResource("2_knmjg")]
+position = Vector2(120, 470)
+collision_layer = 2
+script = ExtResource("3_asmw1")
+visuals_node = NodePath("Visuals")
+collision_shape = NodePath("CollisionShape2D")
+health_component = NodePath("HealthComponent")
+hitbox = NodePath("Hitbox")
+hitbox_shape = NodePath("Hitbox/CollisionShape2D")
+hurtbox = NodePath("Hurtbox")
+hurtbox_shape = NodePath("Hurtbox/CollisionShape2D")
+
+[node name="TrainingDummy" parent="." unique_id=910283741 instance=ExtResource("5_dummy")]
+position = Vector2(260, 500)
+
+[node name="DebugHUD" type="CanvasLayer" parent="." unique_id=568112111 node_paths=PackedStringArray("player")]
+script = ExtResource("4_sa601")
+player = NodePath("../Player")
+
+[node name="WalkerEnemy" parent="." unique_id=920101001 instance=ExtResource("7_walker")]
+position = Vector2(650, 500)
+auto_respawn = true
+respawn_delay = 3.0
+
+[node name="FlyerEnemy" parent="." unique_id=920202001 instance=ExtResource("8_flyer")]
+position = Vector2(850, 320)
+auto_respawn = true
+respawn_delay = 3.0
+
+[node name="ChargerEnemy" parent="." unique_id=920303001 instance=ExtResource("9_charger")]
+position = Vector2(1750, 500)
+auto_respawn = true
+respawn_delay = 3.5
