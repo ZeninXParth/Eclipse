@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/charger_enemy.gd" id="1_charger"]
+[ext_resource type="Script" path="res://scripts/combat/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="3_hurtbox"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="4_hitbox"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 14.0
+height = 40.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurt"]
+radius = 16.0
+height = 44.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hit"]
+radius = 18.0
+height = 46.0
+
+[node name="ChargerEnemy" type="CharacterBody2D" unique_id=920303001 node_paths=PackedStringArray("health_component", "hurtbox", "hurtbox_shape", "hitbox", "hitbox_shape")]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_charger")
+health_component = NodePath("HealthComponent")
+hurtbox = NodePath("Hurtbox")
+hurtbox_shape = NodePath("Hurtbox/CollisionShape2D")
+hitbox = NodePath("Hitbox")
+hitbox_shape = NodePath("Hitbox/CollisionShape2D")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=920303002]
+position = Vector2(0, -18)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=920303003]
+script = ExtResource("2_health")
+max_health = 6
+current_health = 6
+default_invulnerability_duration = 0.15
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=920303004 node_paths=PackedStringArray("health_component")]
+collision_layer = 64
+collision_mask = 8
+script = ExtResource("3_hurtbox")
+health_component = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=920303005]
+position = Vector2(0, -18)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_hurt")
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=920303006 node_paths=PackedStringArray("attacker")]
+collision_layer = 32
+collision_mask = 16
+script = ExtResource("4_hitbox")
+is_player_hitbox = false
+attacker = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=920303007]
+position = Vector2(0, -18)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_hit")
+disabled = true
