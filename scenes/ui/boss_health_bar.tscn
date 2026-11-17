@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/boss_health_bar.gd" id="1_hud"]
+
+[node name="BossHealthBar" type="CanvasLayer"]
+layer = 25
+script = ExtResource("1_hud")
