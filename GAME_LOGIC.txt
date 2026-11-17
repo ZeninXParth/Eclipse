@@ -1,0 +1,340 @@
+================================================================================
+ECLIPSE: Echoes of the Forgotten — Game Logic & Developer Onboarding Guide
+================================================================================
+
+Welcome to the ECLIPSE development team! This document is a complete technical
+guide to the game logic, system architecture, physics formulas, combat pipelines,
+and state machines powering the project.
+
+Whether you are implementing a new enemy, designing a room, adding an ability,
+or tuning gameplay feel, this guide explains how the entire codebase connects
+and how to contribute without breaking existing functionality.
+
+--------------------------------------------------------------------------------
+1. PROJECT OVERVIEW & DESIGN PHILOSOPHY
+--------------------------------------------------------------------------------
+
+- Title: ECLIPSE: Echoes of the Forgotten
+- Genre: 2D Action Metroidvania / Gothic Platformer
+- Engine: Godot Engine 4.7.2 (GDScript, Forward+ / D3D12)
+- Primary Influences: Hollow Knight, Castlevania: Symphony of the Night, Silksong
+- Protagonist: The Aristocratic Occult Detective
+  * Wields an engraved silver Cane Sword (rapier) with electric cyan/lunar light trails.
+  * Channels occult aether into glowing Ethereal Tarot Cards for Focus Healing.
+  * Clad in a tall obsidian silk top hat (royal purple band, brass buckle),
+    tailored waistcoat, pocket watch chain, and coachman's capelet with purple silk lining.
+
+THE 4 CORE DESIGN PILLARS:
+1. Immediate, Tight Locomotion:
+   No sluggish floatiness. Snappy acceleration (2000 px/s^2), instant stopping
+   friction (2400 px/s^2), variable jump height, coyote time, and pre-landing jump buffering.
+2. Readable, Fair Combat:
+   Every enemy and boss attack has distinct startup telegraphs, active damage
+   frames, and post-attack recovery openings. The player has a 0.05s startup,
+   single-hit tracking, directional attacks (up, forward, down-pogo), and hit-stop freeze frames.
+3. Risk & Rhythm Resource Loop:
+   Striking enemies harvests Soul/Aether (+11 per hit). Stationary Focus Healing
+   channels 33 Soul over 0.85s to heal 1 mask, but leaves the player completely vulnerable.
+4. Interconnected World & Ability Gating:
+   Hand-crafted rooms connected via two-way transition gates with camera viewport
+   clamping, checkpoint resting benches, and persistent save data.
+
+--------------------------------------------------------------------------------
+2. DIRECTORY & FILE ORGANIZATION
+--------------------------------------------------------------------------------
+
+res://
+|-- project.godot                     # Project settings, physics layers, viewport (1280x720)
+|-- TEST_CHECKLIST.md                 # Master QA checklist (834 automated tests passing)
+|-- GAME_LOGIC.md / GAME_LOGIC.txt    # This developer guide
+|-- docs/                             # Architecture specifications & Design Decisions (ADRs)
+|   |-- GAME_DESIGN.md                # Game mechanics & narrative design document
+|   |-- TECHNICAL_ARCHITECTURE.md     # Node hierarchies, physics collision matrix
+|   |-- DEVELOPMENT_ROADMAP.md        # Milestone completion status
+|   `-- DECISIONS.md                  # Architectural Decision Records (ADR-001 to ADR-017)
+|-- resources/
+|   `-- player/
+|       `-- default_player_config.tres # Central tuning resource (all kinematic/combat constants)
+|-- scenes/
+|   |-- player/
+|   |   `-- player.tscn               # Detective player scene (CharacterBody2D + Components)
+|   |-- levels/                       # Interconnected world rooms (all inherit from RoomBase)
+|   |   |-- forgotten_entrance.tscn   # Sanctuary starting area with Bench_Entrance
+|   |   |-- sunken_archive.tscn       # Archival ruins, vertical descent, hazard pits, enemies
+|   |   |-- ancient_chamber.tscn      # Boss arena with Archive Warden & confinement gates
+|   |   |-- celestial_sanctuary.tscn  # Post-boss oasis with Bench_Sanctuary & Double Jump altar
+|   |   |-- test_room.tscn            # Kinematics & platforming calibration arena
+|   |   `-- combat_room.tscn          # Combat sparring arena with dummy & mobile enemies
+|   |-- enemies/                      # Mobile enemy archetypes & training targets
+|   |   |-- walker_enemy.tscn         # Scavenger Husk (ground patrol & lunge)
+|   |   |-- flyer_enemy.tscn          # Gloom Bat (hover bob & dive swoop)
+|   |   |-- charger_enemy.tscn        # Armored Beetle (heavy rush & wall-stun)
+|   |   `-- training_dummy.tscn       # Responsive combat sparring target
+|   |-- bosses/
+|   |   |-- archive_warden.tscn       # First boss: Archive Warden (Phase 1 & Phase 2 enrage)
+|   |   `-- ground_shockwave.tscn     # Traveling floor shockwave hazard (pogoable)
+|   |-- objects/
+|   |   |-- transition_point.tscn     # Two-way room gateway trigger
+|   |   |-- bench_checkpoint.tscn     # Gothic rest bench & disk save point
+|   |   `-- ability_pickup.tscn       # World altar for abilities, shards, currency, relics
+|   `-- ui/
+|       |-- debug_hud.tscn            # Real-time telemetry, soul charges, inputs
+|       `-- boss_health_bar.tscn      # Cinematic boss HUD with trailing damage lag bar
+|-- scripts/
+|   |-- core/                         # Singletons, save data, and game state
+|   |   |-- game_manager.gd           # Room streaming orchestrator & fade-to-black singleton
+|   |   `-- player_data.gd            # Flat serializable save data (health, soul, flags, abilities)
+|   |-- player/                       # Character mechanics & visuals
+|   |   |-- player_controller.gd      # CharacterBody2D state machine & kinematics
+|   |   |-- player_config.gd          # Tunable PlayerConfig resource script
+|   |   `-- player_visuals.gd         # Occult Detective procedural vector rendering & VFX
+|   |-- combat/                       # Decoupled component-based combat system
+|   |   |-- hit_data.gd               # RefCounted damage & knockback payload
+|   |   |-- health_component.gd       # Generic health, i-frames, and death dispatcher
+|   |   |-- hitbox.gd                 # Damage-dealing Area2D component
+|   |   |-- hurtbox.gd                # Damage-receiving Area2D component
+|   |   `-- hazard_zone.gd            # Static damage zone (spikes) with pogo rebound
+|   |-- enemies/                      # Reusable AI state machines
+|   |   |-- enemy_base.gd             # Base class for all hostile entities
+|   |   |-- walker_enemy.gd           # Ground patrolling scavenger logic
+|   |   |-- flyer_enemy.gd            # Aerial swooper logic
+|   |   |-- charger_enemy.gd          # Heavy charging tank logic
+|   |   `-- training_dummy.gd         # Sparring target logic
+|   |-- bosses/
+|   |   |-- archive_warden.gd         # Boss AI state machine, shockwaves, and hyper-armor
+|   |   `-- ground_shockwave.gd       # Shockwave projectile logic & Layer 1 barrier dissipation
+|   |-- world/                        # Level scripting & interactables
+|   |   |-- room_base.gd              # Base class for rooms (camera clamping, enemy respawn)
+|   |   |-- transition_point.gd       # Gateway trigger & spawn offset positioning
+|   |   |-- bench_checkpoint.gd       # Rest interaction, vitals recovery & persistence trigger
+|   |   |-- arena_gate.gd             # Solid portcullis confinement barrier
+|   |   |-- ancient_chamber.gd        # Boss arena coordinator script
+|   |   |-- celestial_sanctuary.gd    # Sanctuary room script
+|   |   `-- ability_pickup.gd         # World altar pickup script
+|   |-- ui/
+|   |   |-- debug_hud.gd              # Diagnostic telemetry overlay
+|   |   `-- boss_health_bar.gd        # Cinematic boss health HUD
+|   `-- camera/
+|       `-- camera_controller.gd      # Camera2D bounds clamping & quadratic trauma shake
+`-- tests/                            # Headless automated verification test suites (834 tests)
+
+--------------------------------------------------------------------------------
+3. THE 2D COLLISION LAYER MATRIX
+--------------------------------------------------------------------------------
+
+All physics interactions in ECLIPSE rely on this strict 9-layer allocation:
+
+Layer 1 (Bit 1):   World
+  * Description: Solid geometry, floors, walls, ceilings, one-way platforms, closed arena gates.
+  * Masks: Solid bodies.
+
+Layer 2 (Bit 2):   Player
+  * Description: Player CharacterBody2D physics body.
+  * Masks: Layer 1 (World).
+
+Layer 3 (Bit 4):   Enemies
+  * Description: Enemy CharacterBody2D physics bodies.
+  * Masks: Layer 1 (World).
+
+Layer 4 (Bit 8):   PlayerHitbox
+  * Description: Player Cane Sword attack volume (Hitbox).
+  * Masks: Layer 7 (EnemyHurtbox), Layer 8 (Hazards).
+
+Layer 5 (Bit 16):  PlayerHurtbox
+  * Description: Player vulnerable damage receiver (Hurtbox).
+  * Masks: Layer 6 (EnemyHitbox), Layer 8 (Hazards).
+
+Layer 6 (Bit 32):  EnemyHitbox
+  * Description: Enemy attacks & contact damage (Hitbox).
+  * Masks: Layer 5 (PlayerHurtbox).
+
+Layer 7 (Bit 64):  EnemyHurtbox
+  * Description: Enemy vulnerable damage receiver (Hurtbox).
+  * Masks: Layer 4 (PlayerHitbox).
+
+Layer 8 (Bit 128): Hazards
+  * Description: Spikes, acid, floor shockwaves.
+  * Masks: Deals damage to Layer 5; rebounds Layer 4 pogo.
+
+Layer 9 (Bit 256): Interactables
+  * Description: Checkpoint benches, ability altars, NPC dialogue triggers.
+  * Masks: Layer 2 (Player).
+
+--------------------------------------------------------------------------------
+4. PLAYER MECHANICS & LOCOMOTION LOGIC
+--------------------------------------------------------------------------------
+
+The controller lives in `scripts/player/player_controller.gd`.
+All tuning constants are stored in `scripts/player/player_config.gd`
+(`res://resources/player/default_player_config.tres`).
+
+LOCOMOTION STATE MACHINE (PlayerController.State):
+1. IDLE: Grounded, zero horizontal input.
+2. RUN: Grounded, running with horizontal velocity (max_speed = 260.0 px/s).
+3. JUMP: Airborne, moving upward (velocity.y < 0).
+4. FALL: Airborne, falling downward (velocity.y >= 0).
+5. LAND: Ground touchdown recovery (land_duration = 0.08s), cancelable into RUN or JUMP.
+6. WALL_SLIDE: Clinging against a vertical wall, sliding downward (speed clamped to 120.0 px/s).
+7. WALL_JUMP: Airborne leap away from wall (velocity = Vector2(300, -480)).
+8. DASH: High-speed horizontal burst (dash_speed = 550.0 px/s, duration = 0.16s, zero gravity).
+9. FOCUS: Grounded stationary healing channel (velocity locked, tarot cards circling).
+10. MANTLE: Clinging to a platform ledge corner (velocity zeroed, awaiting vault or drop).
+
+KINEMATICS & FORGIVENESS FORMULAS:
+* Gravity Calculation:
+    jump_gravity = (2.0 * jump_height) / (time_to_peak * time_to_peak)  # ~1660 px/s^2
+    jump_velocity = -jump_gravity * time_to_peak                         # -564.7 px/s
+    fall_gravity = jump_gravity * fall_gravity_multiplier                 # ~2241 px/s^2 (1.35x)
+* Variable Jump Cutoff:
+    Releasing Jump early multiplies upward velocity by 0.5x, allowing short taps (24-32px)
+    or full holds (96px).
+* Coyote Time (0.12s):
+    Leaving a ledge gives 7-8 frames of grace where jump is still valid.
+* Jump Buffering (0.12s):
+    Tapping Jump slightly before landing queues the jump and executes on touchdown.
+* Air Dash:
+    Exactly 1 air dash per airtime. Refreshed by touching ground, sliding on a wall,
+    wall jumping, or landing a downward pogo rebound.
+* Double Jump (Wings of the Lunar Eclipse):
+    Gated by `double_jump_unlocked` (and PlayerData.has_ability("double_jump")).
+    Mid-air Jump applies double_jump_velocity (-460.0 px/s). Refreshes on ground,
+    wall slide, wall jump, or pogo bounce.
+* Athletic Mantle / Ledge Grab:
+    3-ray direct space query detects solid chest wall (y - 18px), open head air clearance (y - 42px),
+    and solid ledge lip surface. Pressing JUMP or UP vaults onto the surface. Pressing DOWN drops.
+
+--------------------------------------------------------------------------------
+5. COMBAT & RESOURCE LOOP LOGIC
+--------------------------------------------------------------------------------
+
+CANE SWORD ATTACK LIFECYCLE:
+  [NONE] -> [STARTUP: 0.05s] -> [ACTIVE: 0.07s] -> [RECOVERY: 0.10s] -> [NONE]
+* Startup (0.05s): Wind-up anticipation. Facing direction locks.
+* Active (0.07s): Hitbox enabled on Layer 4 (PlayerHitbox).
+  - Forward Slash: (facing * 26, -20), size 36x30 px.
+  - Upward Slash (holding UP): (0, -48), size 40x32 px.
+  - Downward Pogo (airborne + holding DOWN): (0, 4), size 36x24 px.
+* Recovery (0.10s): Hitbox disabled. Input buffering queues next swing.
+* Single-Hit Tracking: `_hit_targets` tracks struck entities to guarantee exactly
+  1 hit per swing per entity.
+* Hit-Stop Freeze: Landed strikes freeze attacker and target for 0.06s.
+* Camera Shake: Quadratic trauma-decay camera shake (trauma^2).
+
+AERIAL DOWNWARD POGO REBOUND:
+* Striking an enemy or hazard with a downward slash rebounds player upward with -460.0 px/s,
+  resets coyote time, and refreshes air dash and double jump charges.
+
+SOUL (AETHER) & FOCUS HEALING LOOP:
+* Soul Harvesting: Hitting an enemy grants +11 Soul (max cap 99 = 3 charges of 33).
+  Hazard spikes do NOT award soul.
+* Focus Healing: Grounded, stationary, holding Focus for 0.85s consumes 33 Soul
+  to restore 1 Health Mask. Any movement or damage immediately cancels channel.
+* Visuals: Luminous Ethereal Tarot Cards orbit the detective with cyan celestial runes
+  and a spinning arcane runic circle on the floor.
+
+--------------------------------------------------------------------------------
+6. ENEMY AI & BOSS ARCHITECTURE
+--------------------------------------------------------------------------------
+
+All hostile entities inherit from `EnemyBase` (scripts/enemies/enemy_base.gd).
+State lifecycle: IDLE -> PATROL -> ALERT -> ATTACK -> HURT -> DEAD.
+Includes knockback resistance, white damage flash, and currency drops on defeat.
+
+MOBILE ENEMY ARCHETYPES:
+1. Walker (Scavenger Husk): Ground patrol (50 px/s), ledge/wall turnaround, 0.35s alert,
+   and 180 px/s forward melee lunge.
+2. Flyer (Gloom Bat): Sinusoidal hover bob at zero gravity, downward player detection,
+   220 px/s dive swoop, and parabolic climb return to roost.
+3. Charger (Armored Beetle): Heavy 6 HP tank, 50% knockback resistance, 0.45s roar telegraph,
+   280 px/s forward charge, and 1.2s wall-stun upon hitting solid barriers.
+
+FIRST BOSS: ARCHIVE WARDEN (ArchiveWarden):
+* Located in `ancient_chamber.tscn`. 30 HP, 85% knockback resistance, active hyper-armor (poise).
+* Phase 1 (HP > 15):
+  - Overhead Mace Slam: 0.50s windup -> ground impact -> floor GroundShockwave -> 0.85s recovery.
+  - Forward Thrust Charge: 0.40s windup -> 340 px/s charge (heavy knockback) -> 0.85s recovery.
+* Phase 2 Enrage (HP <= 15):
+  - 1.20s invulnerable roar with screen shake; activates permanent celestial purple aura.
+  - Accelerated windups (0.40s) and recovery windows (0.45s).
+  - Leaping Ground Pound: Leaps high (-520 px/s) toward player -> impact -> dual opposing
+    floor shockwaves traveling left and right.
+* Arena Gates & Persistence: Western and Eastern portcullises seal on encounter trigger,
+  permanently unlock on defeat. Defeat persists in PlayerData (`boss_warden_defeated = true`).
+
+--------------------------------------------------------------------------------
+7. WORLD SCENE STREAMING & PERSISTENCE
+--------------------------------------------------------------------------------
+
+ROOM STREAMING PIPELINE (GameManager):
+1. Player enters TransitionPoint gateway.
+2. GameManager locks player inputs and initiates 0.20s fade to black.
+3. Current room node is freed; target room is instantiated.
+4. Player is positioned at paired `<gate_id>_Spawn` Marker2D with safe entry offset.
+5. Camera limits snap to RoomBase boundaries.
+6. Screen fades in (0.20s) and player input is unlocked.
+
+GOTHIC BENCH CHECKPOINTS (BenchCheckpoint):
+* Rest restores 5/5 health masks and 99/99 soul.
+* Saves game data to disk (`user://save_slot_1.res` or `.json`).
+* Emits `bench_rested`, prompting RoomBase to cleanly respawn defeated room enemies.
+
+PLAYERDATA LEDGER (scripts/core/player_data.gd):
+* Flat serializable ledger: health, soul, currency, mask shards, unlocked abilities,
+  visited rooms, story flags, and spawn anchors.
+* Collecting 4 Mask Shards increments max_health by +1 and fully heals the player.
+
+VERTICAL SLICE ROOMS:
+1. Forgotten Entrance (forgotten_entrance.tscn): Sanctuary bench, arches, gate to Archive.
+2. Sunken Archive (sunken_archive.tscn): Archival halls, vertical drop, enemies, gate to Chamber.
+3. Ancient Chamber (ancient_chamber.tscn): Boss arena, 1000px runway, elevated platforms, gates.
+4. Celestial Sanctuary (celestial_sanctuary.tscn): Oasis with bench, Wings altar, and an 180px
+   elevated balcony holding a secret Mask Shard requiring Double Jump to scale.
+
+--------------------------------------------------------------------------------
+8. AUTOMATED TESTING & HOW TO VERIFY
+--------------------------------------------------------------------------------
+
+The project enforces a Zero Broken Tests Policy. We maintain 834 passing tests
+across 7 automated headless suites (100% pass rate).
+
+To run the complete verification suite from CLI:
+  python -c "
+  import subprocess
+  tests = [
+      'test_player_physics.gd',
+      'test_combat_system.gd',
+      'test_movement_m1.gd',
+      'test_combat_m2.gd',
+      'test_world_m3.gd',
+      'test_boss_m4.gd',
+      'test_progression_m5.gd'
+  ]
+  for t in tests:
+      cmd = ['D:/EREN/Godot_v4.7.2-stable_win64_console.exe', '--headless', '--path', 'C:/Users/HARSHAL/OneDrive/Desktop/Godot/eclipse', '-s', f'tests/{t}']
+      res = subprocess.run(cmd, capture_output=True, text=True)
+      p = [l for l in res.stdout.splitlines() if 'Passed:' in l][-1].strip()
+      f = [l for l in res.stdout.splitlines() if 'Failed:' in l][-1].strip()
+      print(f'{t:25} -> {p}, {f}')
+  "
+
+--------------------------------------------------------------------------------
+9. GOLDEN RULES FOR CONTRIBUTORS
+--------------------------------------------------------------------------------
+
+1. Never Hardcode Numbers:
+   Place speeds, gravities, timers, and damage in `PlayerConfig` or exported variables.
+2. Explicit Static Typing:
+   Always write `var speed: float = 260.0` and `func do_action() -> void:`.
+3. Decouple via Signals:
+   Call down directly to child nodes; emit signals upward to parent/manager nodes.
+4. Preserve Single-Hit per Swing:
+   Track struck nodes in an array/dictionary to prevent multi-hit-per-frame bugs.
+5. Respect Collision Layers:
+   Strictly follow the 9 layers in Section 3.
+6. Keep All 834 Tests Green:
+   Never introduce changes that break existing physics or world tests.
+7. Zero Git Initialization Unless Instructed:
+   Do not initialize git or alter version control files without explicit authorization.
+
+Welcome aboard! Check individual README.md files in `scripts/` for more details.
+================================================================================
