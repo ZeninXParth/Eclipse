@@ -1,0 +1,206 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/ancient_chamber.gd" id="1_chamber"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/archive_warden.tscn" id="3_warden"]
+[ext_resource type="Script" path="res://scripts/world/arena_gate.gd" id="4_gate_script"]
+[ext_resource type="Script" path="res://scripts/ui/boss_health_bar.gd" id="5_health_bar"]
+[ext_resource type="Script" path="res://scripts/world/transition_point.gd" id="6_transition"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="7_hud"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(1850, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_left_platform"]
+size = Vector2(140, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_right_platform"]
+size = Vector2(140, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_left"]
+size = Vector2(60, 560)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_right"]
+size = Vector2(60, 560)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ceiling"]
+size = Vector2(1850, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
+size = Vector2(40, 160)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate_col"]
+size = Vector2(40, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_arena_gate_col"]
+size = Vector2(28, 140)
+
+[node name="AncientChamber" type="Node2D" node_paths=PackedStringArray("warden_boss", "arena_gate_west", "arena_gate_east", "boss_health_bar", "encounter_trigger", "player")]
+script = ExtResource("1_chamber")
+room_id = "ancient_chamber"
+room_name = "The Ancient Chamber"
+limit_left = -100
+limit_right = 1850
+limit_top = -250
+limit_bottom = 850
+respawn_y_threshold = 950.0
+default_spawn_point = Vector2(120, 520)
+warden_boss = NodePath("ArchiveWarden")
+arena_gate_west = NodePath("ArenaGate_West")
+arena_gate_east = NodePath("ArenaGate_East")
+boss_health_bar = NodePath("BossHealthBar")
+encounter_trigger = NodePath("EncounterTrigger")
+player = NodePath("Player")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_left = -200.0
+offset_top = -300.0
+offset_right = 2000.0
+offset_bottom = 950.0
+color = Color(0.04, 0.05, 0.07, 1)
+
+[node name="Geometry" type="StaticBody2D" parent="."]
+collision_mask = 0
+
+[node name="MainFloor" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(875, 590)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="MainFloorVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.11, 0.13, 0.17, 1)
+polygon = PackedVector2Array(-50, 560, 1800, 560, 1800, 620, -50, 620)
+
+[node name="MainFloorRim" type="Line2D" parent="Geometry"]
+points = PackedVector2Array(-50, 561, 1800, 561)
+width = 2.0
+default_color = Color(0.35, 0.45, 0.60, 0.8)
+
+[node name="LeftElevatedPlatform" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(290, 508)
+shape = SubResource("RectangleShape2D_left_platform")
+one_way_collision = true
+
+[node name="LeftElevatedVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.15, 0.18, 0.24, 1)
+polygon = PackedVector2Array(220, 496, 360, 496, 360, 520, 220, 520)
+
+[node name="LeftElevatedRim" type="Line2D" parent="Geometry"]
+points = PackedVector2Array(220, 497, 360, 497)
+width = 2.0
+default_color = Color(0.78, 0.62, 0.28, 0.85)
+
+[node name="RightElevatedPlatform" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(1430, 508)
+shape = SubResource("RectangleShape2D_right_platform")
+one_way_collision = true
+
+[node name="RightElevatedVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.15, 0.18, 0.24, 1)
+polygon = PackedVector2Array(1360, 496, 1500, 496, 1500, 520, 1360, 520)
+
+[node name="RightElevatedRim" type="Line2D" parent="Geometry"]
+points = PackedVector2Array(1360, 497, 1500, 497)
+width = 2.0
+default_color = Color(0.78, 0.62, 0.28, 0.85)
+
+[node name="WallLeft" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(-30, 140)
+shape = SubResource("RectangleShape2D_wall_left")
+
+[node name="WallLeftVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.11, 0.13, 0.17, 1)
+polygon = PackedVector2Array(-60, -140, 0, -140, 0, 420, -60, 420)
+
+[node name="WallRight" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(1750, 140)
+shape = SubResource("RectangleShape2D_wall_right")
+
+[node name="WallRightVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.11, 0.13, 0.17, 1)
+polygon = PackedVector2Array(1720, -140, 1780, -140, 1780, 420, 1720, 420)
+
+[node name="Ceiling" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(875, -110)
+shape = SubResource("RectangleShape2D_ceiling")
+
+[node name="CeilingVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.11, 0.13, 0.17, 1)
+polygon = PackedVector2Array(-60, -140, 1800, -140, 1800, -80, -60, -80)
+
+[node name="Gate_West" type="Area2D" parent="."]
+position = Vector2(50, 500)
+collision_layer = 1
+collision_mask = 18
+script = ExtResource("6_transition")
+gate_id = "Chamber_West"
+target_room_path = "res://scenes/levels/sunken_archive.tscn"
+target_gate_id = "Archive_East"
+travel_direction = Vector2(-1, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gate_West"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_gate_col")
+
+[node name="Chamber_West_Spawn" type="Marker2D" parent="."]
+position = Vector2(120, 520)
+
+[node name="Gate_East" type="Area2D" parent="."]
+position = Vector2(1670, 500)
+collision_layer = 1
+collision_mask = 18
+script = ExtResource("6_transition")
+gate_id = "Chamber_East"
+target_room_path = "res://scenes/levels/celestial_sanctuary.tscn"
+target_gate_id = "Sanctuary_West"
+travel_direction = Vector2(1, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gate_East"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_gate_col")
+
+[node name="Chamber_East_Spawn" type="Marker2D" parent="."]
+position = Vector2(1600, 520)
+
+[node name="ArenaGate_West" type="StaticBody2D" parent="."]
+position = Vector2(200, 560)
+collision_mask = 0
+script = ExtResource("4_gate_script")
+gate_id = "ArenaGate_West"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ArenaGate_West"]
+position = Vector2(0, -70)
+shape = SubResource("RectangleShape2D_arena_gate_col")
+disabled = true
+
+[node name="ArenaGate_East" type="StaticBody2D" parent="."]
+position = Vector2(1520, 560)
+collision_mask = 0
+script = ExtResource("4_gate_script")
+gate_id = "ArenaGate_East"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ArenaGate_East"]
+position = Vector2(0, -70)
+shape = SubResource("RectangleShape2D_arena_gate_col")
+disabled = true
+
+[node name="EncounterTrigger" type="Area2D" parent="."]
+position = Vector2(330, 480)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EncounterTrigger"]
+position = Vector2(0, 0)
+shape = SubResource("RectangleShape2D_trigger")
+
+[node name="ArchiveWarden" parent="." instance=ExtResource("3_warden")]
+position = Vector2(950, 560)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(120, 520)
+
+[node name="BossHealthBar" type="CanvasLayer" parent="."]
+script = ExtResource("5_health_bar")
+
+[node name="DebugHUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("7_hud")
+player = NodePath("../Player")
