@@ -1,0 +1,204 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/combat_room.gd" id="1_combat_room"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="3_player_ctrl"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="4_hud"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/training_dummy.tscn" id="5_dummy"]
+[ext_resource type="Script" path="res://scripts/combat/hazard_zone.gd" id="6_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/walker_enemy.tscn" id="7_walker"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/flyer_enemy.tscn" id="8_flyer"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/charger_enemy.tscn" id="9_charger"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(2400, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_left"]
+size = Vector2(60, 700)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_right"]
+size = Vector2(60, 700)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_walker"]
+size = Vector2(360, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_high"]
+size = Vector2(280, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_charger_wall"]
+size = Vector2(40, 180)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_spikes"]
+size = Vector2(160, 20)
+
+[node name="CombatRoom" type="Node2D" unique_id=702033001 node_paths=PackedStringArray("player")]
+script = ExtResource("1_combat_room")
+player = NodePath("Player")
+
+[node name="Background" type="ColorRect" parent="." unique_id=702033002]
+offset_left = -300.0
+offset_top = -300.0
+offset_right = 2600.0
+offset_bottom = 900.0
+color = Color(0.05, 0.06, 0.09, 1)
+
+[node name="Geometry" type="StaticBody2D" parent="." unique_id=702033003]
+collision_mask = 0
+
+[node name="Floor" type="CollisionShape2D" parent="Geometry" unique_id=702033004]
+position = Vector2(1100, 530)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="Visual_Floor" type="Polygon2D" parent="Geometry" unique_id=702033005]
+color = Color(0.13, 0.16, 0.22, 1)
+polygon = PackedVector2Array(-100, 500, 2300, 500, 2300, 560, -100, 560)
+
+[node name="Rim_Floor" type="Line2D" parent="Geometry" unique_id=702033006]
+points = PackedVector2Array(-100, 501, 2300, 501)
+width = 2.0
+default_color = Color(0.32, 0.42, 0.55, 0.8)
+
+[node name="Wall_Left" type="CollisionShape2D" parent="Geometry" unique_id=702033007]
+position = Vector2(-70, 200)
+shape = SubResource("RectangleShape2D_wall_left")
+
+[node name="Visual_Wall_Left" type="Polygon2D" parent="Geometry" unique_id=702033008]
+color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(-100, -150, -40, -150, -40, 550, -100, 550)
+
+[node name="Wall_Right" type="CollisionShape2D" parent="Geometry" unique_id=702033009]
+position = Vector2(2270, 200)
+shape = SubResource("RectangleShape2D_wall_right")
+
+[node name="Visual_Wall_Right" type="Polygon2D" parent="Geometry" unique_id=702033010]
+color = Color(0.1, 0.12, 0.17, 1)
+polygon = PackedVector2Array(2240, -150, 2300, -150, 2300, 550, 2240, 550)
+
+[node name="Plat_Walker" type="CollisionShape2D" parent="Geometry" unique_id=702033011]
+position = Vector2(650, 360)
+shape = SubResource("RectangleShape2D_plat_walker")
+
+[node name="Visual_Plat_Walker" type="Polygon2D" parent="Geometry" unique_id=702033012]
+color = Color(0.14, 0.18, 0.25, 1)
+polygon = PackedVector2Array(470, 348, 830, 348, 830, 372, 470, 372)
+
+[node name="Rim_Plat_Walker" type="Line2D" parent="Geometry" unique_id=702033013]
+points = PackedVector2Array(470, 349, 830, 349)
+width = 2.0
+default_color = Color(0.4, 0.55, 0.7, 0.85)
+
+[node name="Plat_High" type="CollisionShape2D" parent="Geometry" unique_id=702033014]
+position = Vector2(1050, 240)
+shape = SubResource("RectangleShape2D_plat_high")
+
+[node name="Visual_Plat_High" type="Polygon2D" parent="Geometry" unique_id=702033015]
+color = Color(0.14, 0.18, 0.25, 1)
+polygon = PackedVector2Array(910, 228, 1190, 228, 1190, 252, 910, 252)
+
+[node name="Rim_Plat_High" type="Line2D" parent="Geometry" unique_id=702033016]
+points = PackedVector2Array(910, 229, 1190, 229)
+width = 2.0
+default_color = Color(0.4, 0.55, 0.7, 0.85)
+
+[node name="Charger_Wall_Barrier" type="CollisionShape2D" parent="Geometry" unique_id=702033017]
+position = Vector2(1950, 410)
+shape = SubResource("RectangleShape2D_charger_wall")
+
+[node name="Visual_Charger_Wall" type="Polygon2D" parent="Geometry" unique_id=702033018]
+color = Color(0.18, 0.22, 0.3, 1)
+polygon = PackedVector2Array(1930, 320, 1970, 320, 1970, 500, 1930, 500)
+
+[node name="Rim_Charger_Wall" type="Line2D" parent="Geometry" unique_id=702033019]
+points = PackedVector2Array(1930, 321, 1970, 321)
+width = 2.0
+default_color = Color(0.45, 0.6, 0.78, 0.85)
+
+[node name="HazardSpikes" type="Area2D" parent="." unique_id=702033020]
+position = Vector2(1350, 490)
+collision_layer = 128
+collision_mask = 24
+script = ExtResource("6_hazard")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HazardSpikes" unique_id=702033021]
+position = Vector2(0, 0)
+shape = SubResource("RectangleShape2D_spikes")
+
+[node name="SpikesVisual" type="Polygon2D" parent="HazardSpikes" unique_id=702033022]
+color = Color(0.75, 0.3, 0.3, 0.9)
+polygon = PackedVector2Array(-80, 10, -70, -10, -60, 10, -50, -10, -40, 10, -30, -10, -20, 10, -10, -10, 0, 10, 10, -10, 20, 10, 30, -10, 40, 10, 50, -10, 60, 10, 70, -10, 80, 10)
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1804709936 node_paths=PackedStringArray("visuals_node", "collision_shape", "health_component", "hitbox", "hitbox_shape", "hurtbox", "hurtbox_shape") instance=ExtResource("2_player")]
+position = Vector2(120, 470)
+collision_layer = 2
+script = ExtResource("3_player_ctrl")
+visuals_node = NodePath("Visuals")
+collision_shape = NodePath("CollisionShape2D")
+health_component = NodePath("HealthComponent")
+hitbox = NodePath("Hitbox")
+hitbox_shape = NodePath("Hitbox/CollisionShape2D")
+hurtbox = NodePath("Hurtbox")
+hurtbox_shape = NodePath("Hurtbox/CollisionShape2D")
+
+[node name="TrainingDummy" parent="." unique_id=910283741 instance=ExtResource("5_dummy")]
+position = Vector2(280, 500)
+
+[node name="WalkerEnemy" parent="." unique_id=920101001 instance=ExtResource("7_walker")]
+position = Vector2(650, 348)
+auto_respawn = true
+respawn_delay = 3.0
+
+[node name="FlyerEnemy" parent="." unique_id=920202001 instance=ExtResource("8_flyer")]
+position = Vector2(1050, 160)
+auto_respawn = true
+respawn_delay = 3.0
+
+[node name="ChargerEnemy" parent="." unique_id=920303001 instance=ExtResource("9_charger")]
+position = Vector2(1650, 500)
+auto_respawn = true
+respawn_delay = 3.5
+
+[node name="DebugHUD" type="CanvasLayer" parent="." unique_id=702033023 node_paths=PackedStringArray("player")]
+script = ExtResource("4_hud")
+player = NodePath("../Player")
+
+[node name="Signage" type="Node2D" parent="." unique_id=702033024]
+
+[node name="Header" type="Label" parent="Signage" unique_id=702033025]
+offset_left = 60.0
+offset_top = 340.0
+offset_right = 60.0
+offset_bottom = 340.0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.65, 0.75, 0.88, 0.85)
+text = "ECLIPSE — COMBAT PROVING GROUND (MILESTONE 2)
+[J/X] Melee Attack | [W+J/X] Upward Slash | [Air+S+J/X] Downward Pogo Slash | [H / Q / Pad B] Focus Heal (Hold, Grounded)"
+
+[node name="WalkerSign" type="Label" parent="Signage" unique_id=702033026]
+offset_left = 500.0
+offset_top = 290.0
+offset_right = 500.0
+offset_bottom = 290.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.4, 0.8, 1.0, 0.85)
+text = "▲ TERRACE: Scavenger Husk (Walker)
+Patrols ledges, telegraphs, and lunges"
+
+[node name="FlyerSign" type="Label" parent="Signage" unique_id=702033027]
+offset_left = 930.0
+offset_top = 100.0
+offset_right = 930.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.8, 0.5, 1.0, 0.85)
+text = "▲ AIRSPACE: Gloom Bat (Flyer)
+Hovers aerial, dive swoops, pogoable"
+
+[node name="ChargerSign" type="Label" parent="Signage" unique_id=702033028]
+offset_left = 1520.0
+offset_top = 440.0
+offset_right = 1520.0
+offset_bottom = 440.0
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(1.0, 0.6, 0.4, 0.85)
+text = "▲ CORRIDOR: Armored Beetle (Charger)
+Roar telegraph, rapid charge, wall-slam stun"
