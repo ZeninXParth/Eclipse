@@ -1,0 +1,201 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/room_base.gd" id="1_room"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="3_hud"]
+[ext_resource type="Script" path="res://scripts/world/transition_point.gd" id="4_gate"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/walker_enemy.tscn" id="5_walker"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/flyer_enemy.tscn" id="6_flyer"]
+[ext_resource type="Script" path="res://scripts/combat/hazard_zone.gd" id="7_hazard"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_west_floor"]
+size = Vector2(450, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mid_floor"]
+size = Vector2(500, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lower_floor"]
+size = Vector2(1000, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_upper_gallery"]
+size = Vector2(400, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_left_top"]
+size = Vector2(60, 380)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_left_bot"]
+size = Vector2(60, 250)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_right"]
+size = Vector2(60, 620)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ceiling"]
+size = Vector2(2400, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_spikes"]
+size = Vector2(160, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate_west"]
+size = Vector2(40, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate_east"]
+size = Vector2(40, 100)
+
+[node name="SunkenArchive" type="Node2D" node_paths=PackedStringArray("player")]
+script = ExtResource("1_room")
+room_id = "sunken_archive"
+room_name = "The Sunken Archive"
+limit_left = -100
+limit_right = 2300
+limit_top = -250
+limit_bottom = 850
+respawn_y_threshold = 950.0
+default_spawn_point = Vector2(120, 470)
+player = NodePath("Player")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_left = -200.0
+offset_top = -300.0
+offset_right = 2400.0
+offset_bottom = 950.0
+color = Color(0.05, 0.06, 0.09, 1)
+
+[node name="Geometry" type="StaticBody2D" parent="."]
+collision_mask = 0
+
+[node name="WestFloor" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(175, 525)
+shape = SubResource("RectangleShape2D_west_floor")
+
+[node name="WestFloorVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.12, 0.14, 0.18, 1)
+polygon = PackedVector2Array(-50, 500, 400, 500, 400, 550, -50, 550)
+
+[node name="WestFloorRim" type="Line2D" parent="Geometry"]
+points = PackedVector2Array(-50, 501, 400, 501)
+width = 2.0
+default_color = Color(0.35, 0.45, 0.55, 0.8)
+
+[node name="MidFloor" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(850, 480)
+shape = SubResource("RectangleShape2D_mid_floor")
+
+[node name="MidFloorVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.12, 0.14, 0.18, 1)
+polygon = PackedVector2Array(600, 460, 1100, 460, 1100, 500, 600, 500)
+
+[node name="MidFloorRim" type="Line2D" parent="Geometry"]
+points = PackedVector2Array(600, 461, 1100, 461)
+width = 2.0
+default_color = Color(0.35, 0.45, 0.55, 0.8)
+
+[node name="LowerFloor" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(1650, 690)
+shape = SubResource("RectangleShape2D_lower_floor")
+
+[node name="LowerFloorVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.12, 0.14, 0.18, 1)
+polygon = PackedVector2Array(1150, 660, 2150, 660, 2150, 720, 1150, 720)
+
+[node name="LowerFloorRim" type="Line2D" parent="Geometry"]
+points = PackedVector2Array(1150, 661, 2150, 661)
+width = 2.0
+default_color = Color(0.35, 0.45, 0.55, 0.8)
+
+[node name="UpperGallery" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(1500, 315)
+shape = SubResource("RectangleShape2D_upper_gallery")
+
+[node name="UpperGalleryVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.15, 0.17, 0.23, 1)
+polygon = PackedVector2Array(1300, 300, 1700, 300, 1700, 330, 1300, 330)
+
+[node name="WallLeftTop" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(-30, 100)
+shape = SubResource("RectangleShape2D_wall_left_top")
+
+[node name="WallLeftTopVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.12, 0.14, 0.18, 1)
+polygon = PackedVector2Array(-60, -90, 0, -90, 0, 290, -60, 290)
+
+[node name="WallLeftBot" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(-30, 625)
+shape = SubResource("RectangleShape2D_wall_left_bot")
+
+[node name="WallRight" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(2200, 230)
+shape = SubResource("RectangleShape2D_wall_right")
+
+[node name="WallRightVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.12, 0.14, 0.18, 1)
+polygon = PackedVector2Array(2170, -80, 2230, -80, 2230, 540, 2170, 540)
+
+[node name="Ceiling" type="CollisionShape2D" parent="Geometry"]
+position = Vector2(1100, -110)
+shape = SubResource("RectangleShape2D_ceiling")
+
+[node name="CeilingVisual" type="Polygon2D" parent="Geometry"]
+color = Color(0.12, 0.14, 0.18, 1)
+polygon = PackedVector2Array(-50, -140, 2250, -140, 2250, -80, -50, -80)
+
+[node name="HazardSpikes" type="Area2D" parent="." groups=["pogo_hazard"]]
+position = Vector2(500, 540)
+collision_layer = 128
+collision_mask = 24
+script = ExtResource("7_hazard")
+damage = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HazardSpikes"]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_spikes")
+
+[node name="SpikesVisual" type="Polygon2D" parent="HazardSpikes"]
+color = Color(0.75, 0.25, 0.25, 0.9)
+polygon = PackedVector2Array(-80, 0, -60, -20, -40, 0, -20, -20, 0, 0, 20, -20, 40, 0, 60, -20, 80, 0)
+
+[node name="Gate_West" type="Area2D" parent="."]
+position = Vector2(40, 450)
+collision_layer = 1
+collision_mask = 18
+script = ExtResource("4_gate")
+gate_id = "Archive_West"
+target_room_path = "res://scenes/levels/forgotten_entrance.tscn"
+target_gate_id = "Entrance_East"
+travel_direction = Vector2(-1, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gate_West"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_gate_west")
+
+[node name="Archive_West_Spawn" type="Marker2D" parent="."]
+position = Vector2(120, 470)
+
+[node name="Gate_East" type="Area2D" parent="."]
+position = Vector2(2160, 600)
+collision_layer = 1
+collision_mask = 18
+script = ExtResource("4_gate")
+gate_id = "Archive_East"
+target_room_path = "res://scenes/levels/ancient_chamber.tscn"
+target_gate_id = "Chamber_West"
+travel_direction = Vector2(1, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gate_East"]
+position = Vector2(0, -20)
+shape = SubResource("RectangleShape2D_gate_east")
+
+[node name="Archive_East_Spawn" type="Marker2D" parent="."]
+position = Vector2(2070, 630)
+
+[node name="WalkerEnemy" parent="." instance=ExtResource("5_walker")]
+position = Vector2(900, 440)
+
+[node name="FlyerEnemy" parent="." instance=ExtResource("6_flyer")]
+position = Vector2(1500, 220)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(120, 470)
+
+[node name="DebugHUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("3_hud")
+player = NodePath("../Player")
